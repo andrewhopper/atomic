@@ -14,6 +14,83 @@ Atomic addresses critical challenges in production AI systems:
 - **Enterprise Readiness**: Support compliant execution for regulated industries
 - **Full Observability**: Understand exactly why each model was selected and how it performed
 
+## 🏗️ Architecture Overview
+
+```mermaid
+graph TD
+    %% External Interfaces
+    Client[Client Applications] --> API[API Layer]
+    
+    %% Core Components
+    subgraph "Atomic Framework"
+        API --> Orchestration[Orchestration Layer<br>Temporal/AWS Step Functions]
+        
+        %% Task Processing Flow
+        Orchestration --> TaskDecomposer[Task Decomposer]
+        TaskDecomposer --> BiddingSystem[Model Bidding System]
+        
+        %% Bidding System Components
+        subgraph "Bidding System"
+            BiddingSystem --> BidManager[Bid Manager]
+            BidManager --> BidEvaluator[Bid Evaluator]
+            BidEvaluator --> ModelSelector[Model Selector]
+        end
+        
+        %% Model Execution
+        ModelSelector --> FineTuning[Inference-Time<br>Fine-Tuning Engine]
+        FineTuning --> ModelExecution[Model Execution Engine<br>DSPy/Texts/BAML]
+        
+        %% Output Processing
+        ModelExecution --> OutputValidator[Structured Output Manager<br>Outlines/BAML]
+        OutputValidator --> ResponseAssembler[Response Assembler]
+        
+        %% Observability
+        BiddingSystem -.-> Observability[Observability System]
+        FineTuning -.-> Observability
+        ModelExecution -.-> Observability
+        OutputValidator -.-> Observability
+    end
+    
+    %% External Components
+    subgraph "Model Registry"
+        ModelRegistry[Model Registry]
+    end
+    
+    subgraph "Storage Layer"
+        Database[(PostgreSQL)]
+        KnowledgeGraph[(Knowledge Graph)]
+    end
+    
+    %% Connections to External Components
+    BiddingSystem <--> ModelRegistry
+    Orchestration <--> Database
+    OutputValidator <--> KnowledgeGraph
+    Observability --> Database
+    
+    %% Final Output
+    ResponseAssembler --> API
+    
+    %% Legend
+    classDef core fill:#f9f,stroke:#333,stroke-width:2px
+    classDef external fill:#bbf,stroke:#333,stroke-width:1px
+    classDef data fill:#dfd,stroke:#333,stroke-width:1px
+    
+    class Orchestration,TaskDecomposer,BiddingSystem,FineTuning,ModelExecution,OutputValidator,ResponseAssembler core
+    class API,Client,ModelRegistry external
+    class Database,KnowledgeGraph data
+```
+
+The diagram illustrates the key components of Atomic's architecture:
+
+1. **Client Interface**: Applications interact with Atomic through the API layer
+2. **Orchestration Layer**: Coordinates workflow using Temporal or AWS Step Functions
+3. **Task Decomposer**: Breaks complex requests into atomic microtasks
+4. **Model Bidding System**: Core innovation where models compete for microtasks
+5. **Inference-Time Fine-Tuning Engine**: Adapts models at runtime without retraining
+6. **Model Execution Engine**: Executes selected models using frameworks like DSPy, Texts, BAML
+7. **Structured Output Manager**: Ensures type-safe, schema-validated outputs
+8. **Observability System**: Provides comprehensive visibility into execution paths
+
 ## ⚙️ Technology Stack
 
 | **Component**     | **Technology**                     | **Purpose**                                  |
