@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "claude/license-md.md",
+                "file": "readme.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "license-md"
+              "title": "readme"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "claude/license-md.md",
+                "file": "readme.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for license-md"
+              "title": "Backlinks for readme"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "claude/license-md.md",
+                "file": "readme.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from license-md"
+              "title": "Outgoing links from readme"
             }
           },
           {
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "claude/license-md.md",
+                "file": "readme.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of license-md"
+              "title": "Outline of readme"
             }
           }
         ]
@@ -170,9 +170,10 @@
   },
   "active": "9ea8877db5527373",
   "lastOpenFiles": [
+    "chatgpt/README.md",
+    "claude/license-md.md",
     "claude/readme.md",
     "readme.md",
-    "claude/license-md.md",
     "claude/email-processor-md.md",
     "claude/comparison-md.md",
     "claude/bidding-system-md.md",
@@ -182,7 +183,6 @@
     "chatgpt/docs/bidding-system.md",
     "chatgpt/docs/architecture.md",
     "chatgpt/docs",
-    "chatgpt/README.md",
     "chatgpt/artifacts.py"
   ]
 }

@@ -125,6 +125,54 @@ The core innovation of Atomic is its real-time bidding system where models compe
 
 This approach is inspired by ad exchanges but optimized for AI model execution, ensuring each task is handled by the most appropriate model.
 
+#### Example: Dynamic Model Selection and Early Termination
+
+The following diagram illustrates how Atomic dynamically selects between models and can terminate underperforming streams:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Atomic as Atomic Framework
+    participant Groq
+    participant ChatGPT
+    participant Judge as LLM Judge
+
+    User->>Atomic: Submit request
+    Note over Atomic: Task decomposition
+    
+    par Parallel model execution
+        Atomic->>Groq: Send prompt
+        Atomic->>ChatGPT: Send prompt
+    end
+    
+    Groq-->>Atomic: Begin streaming response
+    ChatGPT-->>Atomic: Begin streaming response
+    
+    Note over Atomic: Initial chunks received
+    
+    Atomic->>Judge: Evaluate initial responses
+    Judge-->>Atomic: Groq response satisfactory
+    
+    Atomic->>ChatGPT: Terminate stream
+    Note over Atomic,ChatGPT: Early termination saves costs
+    
+    Groq-->>Atomic: Complete response
+    Atomic-->>User: Return Groq response
+    
+    Note over Atomic: Update model profiles<br>for future bid decisions
+```
+
+In this example:
+1. Atomic sends the request to both Groq and ChatGPT in parallel
+2. Both models begin streaming their responses
+3. An LLM judge evaluates the initial chunks from both models
+4. The judge determines that Groq's response is satisfactory
+5. Atomic terminates the ChatGPT stream early to save costs
+6. The complete response from Groq is returned to the user
+7. The system updates its model profiles to inform future bidding decisions
+
+This dynamic evaluation and early termination capability significantly reduces costs and latency while maintaining quality.
+
 ### Inference-Time Fine-Tuning
 
 Atomic enables models to adapt at runtime without requiring full retraining:
