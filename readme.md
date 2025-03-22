@@ -509,3 +509,235 @@ enum ActionType {
 | Validation | JSON Schema + Custom |
 | API | GraphQL |
 | Cache | Redis |
+
+## 🔄 Artifact Flow & Schema Validation
+
+Every operation in Atomic is defined by strictly typed artifacts that flow through the system. Each component consumes and produces artifacts that must conform to registered schemas.
+
+### Artifact Flow Example
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Registry as Schema Registry
+    participant Decomposer as Task Decomposer
+    participant Bidding as Bidding System
+    participant Model as Model Execution
+    participant Validator as Output Validator
+    
+    Client->>Registry: 1. Register Schemas
+    Note over Registry: Register Input/Output<br/>Schema Definitions
+    
+    Client->>Decomposer: 2. Submit Request
+    Note over Decomposer: Validates Input Against<br/>RequestSchema
+    
+    Decomposer->>Bidding: 3. Microtasks
+    Note over Bidding: Each Microtask Has<br/>Defined I/O Schema
+    
+    Bidding->>Model: 4. Execute Task
+    Note over Model: Model Must Conform<br/>to Task Schema
+    
+    Model->>Validator: 5. Results
+    Note over Validator: Validate Against<br/>Response Schema
+    
+    Validator->>Client: 6. Return Response
+    Note over Client: Type-Safe Response<br/>Guaranteed
+```
+
+### Key Artifact Types
+
+1. **Request Artifacts**
+   ```typescript
+   interface RequestArtifact<T> {
+     id: string;
+     timestamp: DateTime;
+     input: T;  // Generic input type
+     metadata: RequestMetadata;
+     validationSchema: string;  // Schema ID
+   }
+   ```
+
+2. **Microtask Artifacts**
+   ```typescript
+   interface MicrotaskArtifact {
+     id: string;
+     parentRequestId: string;
+     inputSchema: SchemaDefinition;
+     outputSchema: SchemaDefinition;
+     constraints: TaskConstraints;
+     deadline?: DateTime;
+   }
+   ```
+
+3. **Model Execution Artifacts**
+   ```typescript
+   interface ExecutionArtifact {
+     taskId: string;
+     modelId: string;
+     input: unknown;  // Validated against inputSchema
+     output: unknown;  // Must conform to outputSchema
+     metrics: ExecutionMetrics;
+     validationResults: ValidationResult[];
+   }
+   ```
+
+4. **Response Artifacts**
+   ```typescript
+   interface ResponseArtifact<T> {
+     requestId: string;
+     timestamp: DateTime;
+     output: T;  // Generic output type
+     metadata: ResponseMetadata;
+     validationStatus: ValidationStatus;
+   }
+   ```
+
+### Schema Validation Points
+
+1. **Request Ingestion**
+   - Validates incoming request structure
+   - Ensures required fields are present
+   - Normalizes data types
+   ```typescript
+   // Example validation
+   const validatedRequest = await schemaRegistry.validate(
+     'email-analysis-request-v1',
+     incomingRequest
+   );
+   ```
+
+2. **Task Decomposition**
+   - Validates microtask definitions
+   - Ensures input/output schema compatibility
+   ```typescript
+   // Example microtask schema check
+   const isCompatible = await schemaRegistry.checkCompatibility(
+     sourceSchema,
+     targetSchema
+   );
+   ```
+
+3. **Model Execution**
+   - Validates model inputs
+   - Ensures output conformance
+   ```typescript
+   // Example model output validation
+   const validatedOutput = await outputValidator.validate(
+     modelOutput,
+     taskSchema
+   );
+   ```
+
+4. **Response Assembly**
+   - Validates final response
+   - Ensures all required data is present
+   ```typescript
+   // Example response validation
+   const validatedResponse = await schemaRegistry.validate(
+     'email-analysis-response-v1',
+     assembledResponse
+   );
+   ```
+
+### Schema Evolution
+
+1. **Version Management**
+   ```typescript
+   interface SchemaVersion {
+     id: string;
+     version: string;
+     definition: SchemaDefinition;
+     compatibility: CompatibilityMode;
+     migrations: SchemaMigration[];
+   }
+   ```
+
+2. **Compatibility Modes**
+   - `BACKWARD` - New schema can read old data
+   - `FORWARD` - Old schema can read new data
+   - `FULL` - Both backward and forward compatible
+   - `NONE` - Breaking change
+
+3. **Migration Support**
+   ```typescript
+   interface SchemaMigration {
+     sourceVersion: string;
+     targetVersion: string;
+     migrationScript: string;
+     validationTests: MigrationTest[];
+   }
+   ```
+
+### Benefits of Strict Artifact Typing
+
+1. **Reliability**
+   - Catch errors early in the pipeline
+   - Prevent invalid data propagation
+   - Ensure consistent data structures
+
+2. **Maintainability**
+   - Self-documenting interfaces
+   - Clear component boundaries
+   - Easy schema evolution
+
+3. **Observability**
+   - Track artifact lineage
+   - Monitor schema violations
+   - Debug data flow issues
+
+4. **Security**
+   - Validate data at system boundaries
+   - Prevent injection attacks
+   - Ensure data integrity
+
+### Example: Email Analysis Pipeline
+
+```typescript
+// 1. Define Request Schema
+interface EmailAnalysisRequest {
+  email: EmailInput;
+  analysisType: AnalysisType[];
+  priority: Priority;
+}
+
+// 2. Define Microtask Schemas
+interface SentimentAnalysisTask {
+  input: { text: string };
+  output: { sentiment: Sentiment; confidence: number };
+}
+
+// 3. Define Model Output Schema
+interface ModelOutput {
+  results: AnalysisResult[];
+  metadata: ExecutionMetadata;
+  confidence: number;
+}
+
+// 4. Define Response Schema
+interface EmailAnalysisResponse {
+  analysis: AnalysisResult[];
+  recommendations: Action[];
+  metadata: ResponseMetadata;
+}
+
+// Usage Example
+async function processEmail(request: EmailAnalysisRequest): Promise<EmailAnalysisResponse> {
+  // 1. Validate request
+  const validatedRequest = await schemaRegistry.validate('email-request-v1', request);
+
+  // 2. Decompose into microtasks
+  const tasks = await taskDecomposer.decompose(validatedRequest);
+
+  // 3. Execute and validate each task
+  const results = await Promise.all(
+    tasks.map(async task => {
+      const result = await modelExecutor.execute(task);
+      return outputValidator.validate(result, task.outputSchema);
+    })
+  );
+
+  // 4. Assemble and validate response
+  const response = responseAssembler.assemble(results);
+  return schemaRegistry.validate('email-response-v1', response);
+}
+```
