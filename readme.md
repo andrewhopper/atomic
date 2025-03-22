@@ -4,7 +4,7 @@
 
 **Dynamic AI Orchestration with Optimization**
 
-Atomic is an AI orchestration framework that is built to prioritize explainability, reliability, and efficiency.  Future versions will revolutionize model selection and execution through a real-time bidding system.  The future vision will enables AI models to compete to fufill microtasks based on efficiency metrics.  This will all dynamically adapt models at runtime without retraining, and provides comprehensive observability with type-safe outputs.
+Atomic is an AI orchestration framework that is built to prioritize speed, explainability, reliability, resilience and efficiency.  Future versions will revolutionize model selection and execution through a real-time bidding system.  The future vision will enables AI models to compete to fufill microtasks based on efficiency metrics.  This will all dynamically adapt models at runtime without retraining, and provides comprehensive observability with type-safe outputs.
 
 ## 📌 Challenges and limitations of existing solutions
 
@@ -125,11 +125,11 @@ The diagram illustrates the key components of Atomic's enhanced architecture:
 
 ## Future vision
 
-v1 - Event driven AI orchestration
-v2 - Dynamic routing
-v3 - A ad network style bidding on microtasks
-v4 - A distributed Web3 based distributed reasoning and intelligence network
-v5 - AGI
+1. Event driven AI orchestration
+2. Dynamic routing
+3. Ad network style bidding on microtasks
+4. Distributed Web3 based distributed reasoning and intelligence network
+5. AGI
 
 ## ⚙️ Technology Stack
 
@@ -230,6 +230,27 @@ Ensure reliable, validated outputs through:
 - **Schema Enforcement**: Define expected output structures with Outlines
 - **Runtime Validation**: Verify outputs match defined schemas before returning results
 - **Type-Safe Integration**: Enable seamless integration with downstream systems
+
+# Implementation Plan
+
+## For consideration:
+* Redis, SQS, SNS
+* Temporal, Step Functions
+* gRPC, protobuff, JSON, AVO
+* Rust, Go
+
+## Observability/Tracing
+* OpenTelemetry
+* Prometheus, Grafana
+
+## Deployment
+* k8
+* Terraform
+
+## Client Libraries
+* Python
+* TypeScript
+* Java
 
 ### Comprehensive Observability
 
