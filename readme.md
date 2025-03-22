@@ -40,6 +40,14 @@ graph TD
         Orchestration --> TaskDecomposer[Task Decomposer]
         TaskDecomposer --> BiddingSystem[Model Bidding System]
         
+        %% Schema Registry & Validation
+        subgraph "Global Artifact Registry"
+            SchemaRegistry[Schema Registry]
+            InputValidator[Input Validator]
+            OutputValidator[Output Validator]
+            ArtifactVersioning[Artifact Versioning]
+        end
+        
         %% Bidding System Components
         subgraph "Bidding System"
             BiddingSystem --> BidManager[Bid Manager]
@@ -59,24 +67,26 @@ graph TD
         FineTuningB --> ModelExecutionB[Model Execution B<br>DSPy/Texts/BAML]
         FineTuningC --> ModelExecutionC[Model Execution C<br>DSPy/Texts/BAML]
         
+        %% Schema Validation Flow
+        ModelExecutionA --> OutputValidator
+        ModelExecutionB --> OutputValidator
+        ModelExecutionC --> OutputValidator
+        
         %% Criteria Evaluation Loop
-        ModelExecutionA --> CriteriaEvaluator[Criteria Satisfaction<br>Evaluation Loop]
-        ModelExecutionB --> CriteriaEvaluator
-        ModelExecutionC --> CriteriaEvaluator
+        OutputValidator --> CriteriaEvaluator[Criteria Satisfaction<br>Evaluation Loop]
         
         %% Join Point
         CriteriaEvaluator --> JoinPoint[Execution Join Point]
         
         %% Output Processing
-        JoinPoint --> OutputValidator[Structured Output Manager<br>Outlines/BAML]
-        OutputValidator --> ResponseAssembler[Response Assembler]
+        JoinPoint --> ResponseAssembler[Response Assembler]
         
         %% Observability
         BiddingSystem -.-> Observability[Observability System]
         ParallelExecution -.-> Observability
         CriteriaEvaluator -.-> Observability
         JoinPoint -.-> Observability
-        OutputValidator -.-> Observability
+        SchemaRegistry -.-> Observability
     end
     
     %% External Components
@@ -92,7 +102,7 @@ graph TD
     %% Connections to External Components
     BiddingSystem <--> ModelRegistry
     Orchestration <--> Database
-    OutputValidator <--> KnowledgeGraph
+    SchemaRegistry <--> KnowledgeGraph
     Observability --> Database
     
     %% Final Output
@@ -252,6 +262,9 @@ Ensure reliable, validated outputs through:
 * TypeScript
 * Java
 
+## Storage
+* Bloom filters with Apache Cassandra, Apache HBase, Redis, or Apache Parquet. 
+
 ### Comprehensive Observability
 
 Gain complete visibility into model selection and execution:
@@ -388,3 +401,111 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🤝 Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## 🔬 Global Artifact Schema Registry
+
+The Global Artifact Schema Registry is a central component that ensures type safety and data consistency across the entire system:
+
+### Core Components
+
+1. **Schema Registry**
+   - Centralized repository for all input/output schemas
+   - Version control for schema evolution
+   - Compatibility checking between versions
+   - Integration with popular schema formats (Protobuf, Avro, JSON Schema)
+
+2. **Input/Output Validators**
+   - Runtime validation of all artifacts
+   - Schema enforcement at system boundaries
+   - Automatic type conversion and normalization
+   - Error handling and validation feedback
+
+3. **Artifact Versioning**
+   - Semantic versioning for all artifacts
+   - Backward/forward compatibility checks
+   - Migration tools for schema evolution
+   - Version dependency management
+
+### Schema Definition Example
+
+```typescript
+// Example of a schema definition using TypeScript-like syntax
+interface EmailAnalysisInput {
+  sender: string;
+  recipient: string;
+  subject: string;
+  body: string;
+  metadata: {
+    timestamp: DateTime;
+    priority?: number;
+    tags?: string[];
+  };
+}
+
+interface EmailAnalysisOutput {
+  category: EmailCategory;
+  sentiment: SentimentLevel;
+  priority: number;
+  suggestedAction: ActionType;
+  confidence: number;
+  metadata: {
+    modelId: string;
+    executionTime: number;
+    cost: number;
+  };
+}
+
+// Enum definitions
+enum EmailCategory {
+  SUPPORT = 'support',
+  SALES = 'sales',
+  COMPLAINT = 'complaint',
+  INQUIRY = 'inquiry',
+  SPAM = 'spam'
+}
+
+enum SentimentLevel {
+  POSITIVE = 'positive',
+  NEUTRAL = 'neutral',
+  NEGATIVE = 'negative'
+}
+
+enum ActionType {
+  URGENT_RESPONSE = 'urgent_response',
+  STANDARD_RESPONSE = 'standard_response',
+  FLAG_FOR_REVIEW = 'flag_for_review',
+  ARCHIVE = 'archive'
+}
+```
+
+### Benefits
+
+1. **Type Safety**
+   - Guaranteed consistency between components
+   - Early detection of interface mismatches
+   - Automated type checking and validation
+
+2. **Documentation**
+   - Self-documenting interfaces
+   - Generated API documentation
+   - Clear contract between components
+
+3. **Evolution**
+   - Safe schema evolution
+   - Backward compatibility checking
+   - Automated migration support
+
+4. **Integration**
+   - Language-agnostic schema definitions
+   - Multi-format support (JSON, Protobuf, Avro)
+   - Easy integration with existing tools
+
+### Technology Stack
+
+| Component | Technology |
+|-----------|------------|
+| Schema Storage | PostgreSQL |
+| Versioning | Git-based |
+| Validation | JSON Schema + Custom |
+| API | GraphQL |
+| Cache | Redis |
