@@ -1,9 +1,12 @@
 
-**Dynamic AI Orchestration with Model Bidding and Runtime Optimization**
+> ⚠️ **Warning**: This project is currently in conceptual phase and not yet implemented. I welcome contributions, ideas and collaboration to help bring this vision to life! If you're interested in getting involved, please feel free to open issues, submit PRs or reach out to discuss.
+
+
+**Dynamic AI Orchestration with Optimization**
 
 Atomic is an AI orchestration framework that is built to prioritize explainability, reliability, and efficiency.  Future versions will revolutionize model selection and execution through a real-time bidding system.  The future vision will enables AI models to compete to fufill microtasks based on efficiency metrics.  This will all dynamically adapt models at runtime without retraining, and provides comprehensive observability with type-safe outputs.
 
-## 📌 Executive Summary
+## 📌 Challenges and limitations of existing solutions
 
 Atomic addresses critical challenges in production AI systems:
 
@@ -15,7 +18,7 @@ Atomic addresses critical challenges in production AI systems:
 - **6. Resilient Fallbacks**: Automatic fallback mechanisms seamlessly transition to alternative models when primary options fail or underperform based on deterministic evals and performance metrics.
 - **7. Resource Optimization**:  Cost management dynamically balances performance needs with budget constraints
 
-## Benefits
+## Benefits of Atomic
 - **Cost Efficiency**: Automatically select the most efficient model for each specific task
 - **Runtime Adaptation**: Fine-tune models at inference time without costly retraining
 - **Type Safety and structured output**: Ensure reliable, structured outputs with schema validation
