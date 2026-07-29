@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant User
+    participant Atomic as Atomic Framework
+    participant Groq
+    participant ChatGPT
+    participant Judge as LLM Judge
+
+    User->>Atomic: Submit request
+    Note over Atomic: Task decomposition
+
+    par Parallel model execution
+        Atomic->>Groq: Send prompt
+        Atomic->>ChatGPT: Send prompt
+    end
+
+    Groq-->>Atomic: Begin streaming response
+    ChatGPT-->>Atomic: Begin streaming response
+
+    Note over Atomic: Initial chunks received
+
+    Atomic->>Judge: Evaluate initial responses
+    Judge-->>Atomic: Groq response satisfactory
+
+    Atomic->>ChatGPT: Terminate stream
+    Note over Atomic,ChatGPT: Early termination saves costs
+
+    Groq-->>Atomic: Complete response
+    Atomic-->>User: Return Groq response
+
+    Note over Atomic: Update model profiles<br>for future bid decisions

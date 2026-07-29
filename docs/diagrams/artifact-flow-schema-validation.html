@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Artifact Flow with Schema Validation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        .diagram { display: flex; justify-content: center; overflow-x: auto; }
+    </style>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'base' });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Artifact Flow: Schema Validation & Type Safety</h1>
+        <div class="diagram">
+            <div class="mermaid">
+sequenceDiagram
+    participant Client
+    participant Registry as Schema Registry
+    participant Decomposer as Task Decomposer
+    participant Bidding as Bidding System
+    participant Model as Model Execution
+    participant Validator as Output Validator
+
+    Client->>Registry: 1. Register Schemas
+    Note over Registry: Register Input/Output<br/>Schema Definitions
+
+    Client->>Decomposer: 2. Submit Request
+    Note over Decomposer: Validates Input Against<br/>RequestSchema
+
+    Decomposer->>Bidding: 3. Microtasks
+    Note over Bidding: Each Microtask Has<br/>Defined I/O Schema
+
+    Bidding->>Model: 4. Execute Task
+    Note over Model: Model Must Conform<br/>to Task Schema
+
+    Model->>Validator: 5. Results
+    Note over Validator: Validate Against<br/>Response Schema
+
+    Validator->>Client: 6. Return Response
+    Note over Client: Type-Safe Response<br/>Guaranteed
+            </div>
+        </div>
+    </div>
+</body>
+</html>

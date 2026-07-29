@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant Client
+    participant Registry as Schema Registry
+    participant Decomposer as Task Decomposer
+    participant Bidding as Bidding System
+    participant Model as Model Execution
+    participant Validator as Output Validator
+
+    Client->>Registry: 1. Register Schemas
+    Note over Registry: Register Input/Output<br/>Schema Definitions
+
+    Client->>Decomposer: 2. Submit Request
+    Note over Decomposer: Validates Input Against<br/>RequestSchema
+
+    Decomposer->>Bidding: 3. Microtasks
+    Note over Bidding: Each Microtask Has<br/>Defined I/O Schema
+
+    Bidding->>Model: 4. Execute Task
+    Note over Model: Model Must Conform<br/>to Task Schema
+
+    Model->>Validator: 5. Results
+    Note over Validator: Validate Against<br/>Response Schema
+
+    Validator->>Client: 6. Return Response
+    Note over Client: Type-Safe Response<br/>Guaranteed

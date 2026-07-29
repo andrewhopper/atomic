@@ -1,0 +1,61 @@
+graph TD
+    %% External Interfaces
+    Client[Client Applications] --> API[API Layer]
+
+    %% Core Components
+    subgraph "Atomic Framework"
+        API --> Orchestration[Orchestration Layer<br>Temporal/AWS Step Functions]
+
+        %% Task Processing Flow
+        Orchestration --> TaskDecomposer[Task Decomposer]
+        TaskDecomposer --> BiddingSystem[Model Bidding System]
+
+        %% Bidding System Components
+        subgraph "Bidding System"
+            BiddingSystem --> BidManager[Bid Manager]
+            BidManager --> BidEvaluator[Bid Evaluator]
+            BidEvaluator --> ModelSelector[Model Selector]
+        end
+
+        %% Model Execution
+        ModelSelector --> FineTuning[Inference-Time<br>Fine-Tuning Engine]
+        FineTuning --> ModelExecution[Model Execution Engine<br>DSPy/Texts/BAML]
+
+        %% Output Processing
+        ModelExecution --> OutputValidator[Structured Output Manager<br>Outlines/BAML]
+        OutputValidator --> ResponseAssembler[Response Assembler]
+
+        %% Observability
+        BiddingSystem -.-> Observability[Observability System]
+        FineTuning -.-> Observability
+        ModelExecution -.-> Observability
+        OutputValidator -.-> Observability
+    end
+
+    %% External Components
+    subgraph "Model Registry"
+        ModelRegistry[Model Registry]
+    end
+
+    subgraph "Storage Layer"
+        Database[(PostgreSQL)]
+        KnowledgeGraph[(Knowledge Graph)]
+    end
+
+    %% Connections to External Components
+    BiddingSystem <--> ModelRegistry
+    Orchestration <--> Database
+    OutputValidator <--> KnowledgeGraph
+    Observability --> Database
+
+    %% Final Output
+    ResponseAssembler --> API
+
+    %% Legend
+    classDef core fill:#f9f,stroke:#333,stroke-width:2px
+    classDef external fill:#bbf,stroke:#333,stroke-width:1px
+    classDef data fill:#dfd,stroke:#333,stroke-width:1px
+
+    class Orchestration,TaskDecomposer,BiddingSystem,FineTuning,ModelExecution,OutputValidator,ResponseAssembler core
+    class API,Client,ModelRegistry external
+    class Database,KnowledgeGraph data
